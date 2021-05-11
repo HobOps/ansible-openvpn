@@ -1,0 +1,20 @@
+all:
+  vars:
+    ansible_python_interpreter: '/usr/bin/python3'
+    ansible_ssh_pipelining: true
+    ansible_pipelining: true
+    ansible_connection: ssh
+    ansible_user: root
+    ansible_become: true
+    ansible_ssh_private_key_file: "./secrets/sshkey"
+    sshd_config: "/etc/ssh/sshd_config"
+  hosts:
+  children:
+    vpnserver:
+      hosts:
+        vpn01:
+          ansible_host: 192.168.0.1
+          ansible_port: 22
+          ansible_user: "root"
+          openvpn_port: 1194
+          openvpn_proto: "udp4"
