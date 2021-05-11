@@ -1,0 +1,12 @@
+---
+- name: restart sshd
+  systemd:
+    daemon_reload: true
+    name: "sshd"
+    state: restarted
+
+- name: restart fail2ban
+  systemd:
+    daemon_reload: true
+    name: "fail2ban"
+    state: restarted

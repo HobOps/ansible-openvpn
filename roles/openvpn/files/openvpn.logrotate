@@ -1,0 +1,8 @@
+/var/log/openvpn/server.log {
+    missingok
+    notifempty
+    size 16M
+    monthly
+    dateext
+    create 0600 root root
+}

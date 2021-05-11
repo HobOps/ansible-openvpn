@@ -1,0 +1,30 @@
+---
+- name: Apply common tasks
+  hosts: all
+  gather_facts: false
+  tasks:
+  - import_role:
+      name: common
+  tags: common
+
+- name: Update system
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Update apt-get repo and cache
+    apt:
+      cache_valid_time: 3600
+      force_apt_get: yes
+
+  - name: Upgrade the OS
+    apt:
+      upgrade: dist
+  tags: common
+
+- name: Apply common tasks
+  hosts: vpnserver
+  gather_facts: false
+  tasks:
+  - import_role:
+      name: openvpn
+  tags: openvpn

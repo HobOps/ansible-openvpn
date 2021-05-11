@@ -1,0 +1,74 @@
+---
+- name: Install OpenVPN
+  apt:
+    name: "{{item}}"
+    cache_valid_time: 3600
+    state: latest
+  loop:
+    - openvpn
+    - firewalld
+
+- name: Copy OpenVPN cert files
+  ansible.builtin.copy:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+    owner: root
+    group: root
+    mode: "600"
+  notify: restart openvpn
+  loop:
+    - { src: "openvpn.logrotate", dest: "/etc/logrotate.d/openvpn" }
+    - { src: "../../../secrets/openvpn-users-ca.crt", dest: "/etc/openvpn/server.ca" }
+    - { src: "../../../secrets/openvpn-users-ca.crl", dest: "/etc/openvpn/server.crl" }
+    - { src: "../../../secrets/openvpn-server.crt", dest: "/etc/openvpn/server.crt" }
+    - { src: "../../../secrets/openvpn-server.key", dest: "/etc/openvpn/server.key" }
+    - { src: "../../../secrets/openvpn-server.ta", dest: "/etc/openvpn/server.ta" }
+    - { src: "../../../secrets/server.dhparam", dest: "/etc/openvpn/server.dhparam" }
+
+- name: Copy OpenVPN config file
+  ansible.builtin.template:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+    owner: root
+    group: root
+    mode: "600"
+  notify: restart openvpn
+  loop:
+    - { src: "server.conf.j2", dest: "/etc/openvpn/server.conf" }
+
+- name: Enable openvpn service
+  ansible.builtin.systemd:
+    name: openvpn@server
+    enabled: "yes"
+    state: started
+
+- name: Enable IPv4 forwarding
+  ansible.posix.sysctl:
+    name: "net.ipv4.ip_forward"
+    value: "1"
+    sysctl_set: "yes"
+    state: present
+    reload: "yes"
+
+- name: Enable firewalld service
+  ansible.builtin.systemd:
+    name: firewalld
+    enabled: "yes"
+    state: started
+
+- name: Permit OpenVPN traffic
+  ansible.posix.firewalld:
+    port: "{{item}}"
+    permanent: "yes"
+    immediate: "yes"
+    state: enabled
+  loop:
+    - "{{openvpn_port}}/tcp"
+    - "{{openvpn_port}}/udp"
+
+- name: Enable NAT
+  ansible.posix.firewalld:
+    masquerade: "yes"
+    permanent: "yes"
+    immediate: "yes"
+    state: enabled

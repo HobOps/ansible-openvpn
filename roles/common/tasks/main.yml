@@ -1,0 +1,13 @@
+---
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: "{{inventory_hostname}}"
+
+- name: SSH config
+  include_tasks: ssh_config.yml
+
+- name: Install system packages (Ubuntu)
+  include_tasks: system_packages_ubuntu.yml
+
+- name: Install fail2ban
+  include_tasks: fail2ban.yml

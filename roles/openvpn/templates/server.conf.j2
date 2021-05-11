@@ -1,0 +1,34 @@
+dev ovpns1
+verb 4
+dev-type tun
+writepid /var/run/openvpn_server1.pid
+script-security 3
+daemon
+keepalive 10 60
+ping-timer-rem
+persist-tun
+persist-key
+proto {{openvpn_proto}}
+cipher AES-128-CBC
+auth SHA256
+tls-server
+server 172.30.20.0 255.255.255.0
+lport {{openvpn_port}}
+management /etc/openvpn/server.sock unix
+max-clients 20
+push "redirect-gateway def1"
+push "compress"
+push "link-mtu 1570"
+ca /etc/openvpn/server.ca
+cert /etc/openvpn/server.crt
+key /etc/openvpn/server.key
+dh /etc/openvpn/server.dhparam
+tls-auth /etc/openvpn/server.ta 0
+crl-verify /etc/openvpn/server.crl
+log-append /var/log/openvpn/server.log
+status /etc/openvpn/server.status
+ncp-disable
+compress
+persist-remote-ip
+float
+topology subnet

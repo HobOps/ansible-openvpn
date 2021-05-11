@@ -1,0 +1,20 @@
+---
+- name: Install system packages
+  apt:
+    name: "{{item}}"
+    cache_valid_time: 3600
+    state: latest
+  loop:
+    - apt-transport-https
+    - bwm-ng
+    - ca-certificates
+    - curl
+    - git
+    - gnupg
+    - iproute2
+    - iputils-ping
+    - jq
+    - lsb-release
+    - python3-pip
+    - rsync
+    - screen
